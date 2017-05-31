@@ -1928,12 +1928,15 @@ namespace ArchiSteamFarm {
 			}
 
             RandomGamesPlayedWhileIdle.Add(440); // Add TF2
-			for (byte i = 1; i <= 32; i++) {
-                Random rand = new Random();
+            Random rand = new Random();
+			for (byte i = 1; i < 32; i++) {
                 int dictSize = ownedGamesToChoose.Count;
                 uint RandomedlyChosenGamesFromOwned = ownedGamesToChoose.ElementAt(rand.Next(0, dictSize)).Key;
                 RandomGamesPlayedWhileIdle.Add(RandomedlyChosenGamesFromOwned);
+                string s = string.Format("[JS] added {0:00} at {1:00}-th time", RandomedlyChosenGamesFromOwned, i);
+                ArchiLogger.LogGenericInfo(s);
             }
+            Thread.Sleep(1000);// sleep 1sec
 			ArchiHandler.PlayGames(RandomGamesPlayedWhileIdle, BotConfig.CustomGamePlayedWhileIdle);
             #endif // #if TEMP_BLOCKING_ORIG_CODE
 		}
