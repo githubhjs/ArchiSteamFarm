@@ -61,6 +61,9 @@ namespace ArchiSteamFarm {
 		internal readonly ArchiWebHandler ArchiWebHandler;
 		internal readonly string BotName;
 
+        internal HashSet<uint> RandomGamesPlayedWhileIdle = new HashSet<uint>();
+		internal Dictionary<uint, string> ownedGamesToChoose;
+
 		internal bool CanReceiveSteamCards => !IsAccountLimited && !IsAccountLocked;
 		internal bool HasMobileAuthenticator => BotDatabase?.MobileAuthenticator != null;
 		internal bool IsConnectedAndLoggedOn => SteamID != 0;
@@ -1910,12 +1913,29 @@ namespace ArchiSteamFarm {
 			}
 		}
 
-		private void ResetGamesPlayed() {
+		private async Task ResetGamesPlayed() {
 			if (!IsPlayingPossible || (FamilySharingInactivityTimer != null)) {
 				return;
 			}
 
-			ArchiHandler.PlayGames(BotConfig.GamesPlayedWhileIdle, BotConfig.CustomGamePlayedWhileIdle);
+            #if TEMP_BLOCKING_ORIG_CODE
+		    ArchiHandler.PlayGames(BotConfig.GamesPlayedWhileIdle, BotConfig.CustomGamePlayedWhileIdle);
+            #else // RandomGamesPlayedWhileIdle
+			if (await ArchiWebHandler.HasValidApiKey().ConfigureAwait(false)) {
+				ownedGamesToChoose = await ArchiWebHandler.GetOwnedGames(SteamID).ConfigureAwait(false);
+			} else {
+				ownedGamesToChoose = await ArchiWebHandler.GetMyOwnedGames().ConfigureAwait(false);
+			}
+
+            RandomGamesPlayedWhileIdle.Add(440); // Add TF2
+			for (byte i = 1; i <= 32; i++) {
+                Random rand = new Random();
+                int dictSize = ownedGamesToChoose.Count;
+                uint RandomedlyChosenGamesFromOwned = ownedGamesToChoose.ElementAt(rand.Next(0, dictSize)).Key;
+                RandomGamesPlayedWhileIdle.Add(RandomedlyChosenGamesFromOwned);
+            }
+			ArchiHandler.PlayGames(RandomGamesPlayedWhileIdle, BotConfig.CustomGamePlayedWhileIdle);
+            #endif // #if TEMP_BLOCKING_ORIG_CODE
 		}
 
 		private void ResetPlayingWasBlockedWithTimer() {
