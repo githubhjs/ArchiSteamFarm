@@ -1933,7 +1933,7 @@ namespace ArchiSteamFarm {
                 int dictSize = ownedGamesToChoose.Count;
                 uint RandomedlyChosenGamesFromOwned = ownedGamesToChoose.ElementAt(rand.Next(0, dictSize)).Key;
                 RandomGamesPlayedWhileIdle.Add(RandomedlyChosenGamesFromOwned);
-                string s = string.Format("[JS] added {0:00} at {1:00}-th time", RandomedlyChosenGamesFromOwned, i);
+                string s = string.Format("[JS] added {0:000000} at {1:00}-th time", RandomedlyChosenGamesFromOwned, i);
                 ArchiLogger.LogGenericInfo(s);
             }
             Thread.Sleep(1000);// sleep 1sec
