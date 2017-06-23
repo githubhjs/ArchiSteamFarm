@@ -33,7 +33,7 @@ using Humanizer;
 
 namespace ArchiSteamFarm {
 	internal static class Utilities {
-		//private static readonly Random Random = new Random();
+		private static readonly Random Random = new Random();
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[SuppressMessage("ReSharper", "UnusedParameter.Global")]
@@ -69,7 +69,6 @@ namespace ArchiSteamFarm {
 
 		internal static uint GetUnixTime() => (uint) DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-		/*
 		internal static int RandomNext(int maxWithout) {
 			if (maxWithout <= 0) {
 				ASF.ArchiLogger.LogNullError(nameof(maxWithout));
@@ -84,7 +83,6 @@ namespace ArchiSteamFarm {
 				return Random.Next(maxWithout);
 			}
 		}
-		*/
 
 		internal static bool IsValidHexadecimalString(string text) {
 			if (string.IsNullOrEmpty(text)) {
