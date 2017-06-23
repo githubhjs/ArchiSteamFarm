@@ -682,12 +682,23 @@ namespace ArchiSteamFarm {
 			return 0;
 		}
 
-		internal async Task<HtmlDocument> GetSteamAwardsPage() {
+		internal async Task<HtmlDocument> GetSteamPrefPage() {
 			if (!await RefreshSessionIfNeeded().ConfigureAwait(false)) {
 				return null;
 			}
 
-			const string request = SteamStoreURL + "/SteamAwards?l=english";
+			//const string request = SteamStoreURL + "/SteamAwards?l=english";
+			const string request = SteamStoreURL + "/account/preferences/?l=english";
+			return await WebBrowser.UrlGetToHtmlDocumentRetry(request).ConfigureAwait(false);
+		}
+
+		internal async Task<HtmlDocument> GetSteamHomePage() {
+			if (!await RefreshSessionIfNeeded().ConfigureAwait(false)) {
+				return null;
+			}
+
+			//const string request = SteamStoreURL + "/SteamAwards?l=english";
+			const string request = SteamCommunityURL + "/my/home?l=english";
 			return await WebBrowser.UrlGetToHtmlDocumentRetry(request).ConfigureAwait(false);
 		}
 
