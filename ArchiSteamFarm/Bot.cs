@@ -783,6 +783,21 @@ namespace ArchiSteamFarm {
 					return await ResponseStatus(steamID, args[1]).ConfigureAwait(false);
 				case "!STOP":
 					return await ResponseStop(steamID, args[1]).ConfigureAwait(false);
+				case "!V":
+				case "!VIEW":
+					//if (args.Length > 2) {
+					//	return await ResponseView(steamID, args[1], args.GetArgsAsString(2)).ConfigureAwait(false);
+					//}
+
+					return await ResponseView(steamID, args[1]).ConfigureAwait(false);
+
+				//case "!G":
+				//case "!GROUP":
+				//	//if (args.Length > 2) {
+				//	//	return await ResponseView(steamID, args[1], args.GetArgsAsString(2)).ConfigureAwait(false);
+				//	//}
+
+				//	return await ResponseView(steamID, args[1]).ConfigureAwait(false);
 				default:
 					return ResponseUnknown(steamID);
 			}
@@ -2055,6 +2070,32 @@ namespace ArchiSteamFarm {
 			List<string> responses = new List<string>(results.Where(result => !string.IsNullOrEmpty(result)));
 			return responses.Count > 0 ? string.Join("", responses) : null;
 		}
+
+		private async Task<string> ResponseView(ulong steamID, string URL) {
+			if ((steamID == 0) || (URL == null)) {
+				ArchiLogger.LogNullError(nameof(steamID) + " || " + URL);
+				return null;
+			}
+
+			if (!IsOperator(steamID)) {
+				return null;
+			}
+
+			if (!IsConnectedAndLoggedOn) {
+				return FormatBotResponse(Strings.BotNotConnected);
+			}
+
+			StringBuilder response = new StringBuilder();
+
+				if (await ArchiWebHandler.BrowseURL(URL).ConfigureAwait(false)) {
+					//response.Append(FormatBotResponse(string.Format(Strings.BotAddLicenseWithItems, gameID, EResult.OK, gameID)));
+				} else {
+					//response.Append(FormatBotResponse(string.Format(Strings.BotAddLicense, gameID, EResult.AccessDenied)));
+				}
+
+			return response.Length > 0 ? response.ToString() : null;
+		}
+
 
 		private async Task<string> ResponseAddLicense(ulong steamID, ICollection<uint> gameIDs) {
 			if ((steamID == 0) || (gameIDs == null) || (gameIDs.Count == 0)) {

@@ -110,6 +110,26 @@ namespace ArchiSteamFarm {
 			return await WebBrowser.UrlPostRetry(request, data, referer).ConfigureAwait(false);
 		}
 
+		internal async Task<bool> BrowseURL(string URL) {
+            if (URL == null) {
+                return false;
+            }
+
+			if (!await RefreshSessionIfNeeded().ConfigureAwait(false)) {
+				return false;
+			}
+
+			string sessionID = WebBrowser.CookieContainer.GetCookieValue(SteamCommunityURL, "sessionid");
+			if (string.IsNullOrEmpty(sessionID)) {
+				Bot.ArchiLogger.LogNullError(nameof(sessionID));
+				return false;
+			}
+
+			const string request = URL;
+			HtmlDocument htmlDocument = await WebBrowser.UrlPostToHtmlDocumentRetry(request, data).ConfigureAwait(false);
+			return true;
+        }
+
 		internal async Task<bool> AddFreeLicense(uint subID) {
 			if (subID == 0) {
 				Bot.ArchiLogger.LogNullError(nameof(subID));
