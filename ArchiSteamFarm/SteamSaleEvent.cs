@@ -1,4 +1,4 @@
-﻿/*
+/*
     _                _      _  ____   _                           _____
    / \    _ __  ___ | |__  (_)/ ___| | |_  ___   __ _  _ __ ___  |  ___|__ _  _ __  _ __ ___
   / _ \  | '__|/ __|| '_ \ | |\___ \ | __|/ _ \ / _` || '_ ` _ \ | |_  / _` || '__|| '_ ` _ \
@@ -22,7 +22,6 @@
 
 */
 
-/*
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -31,7 +30,7 @@ using HtmlAgilityPack;
 
 namespace ArchiSteamFarm {
 	internal sealed class SteamSaleEvent : IDisposable {
-		private static readonly DateTime SaleEndingDateUtc = new DateTime(2017, 1, 2, 18, 0, 0, DateTimeKind.Utc);
+		private static readonly DateTime SaleEndingDateUtc = new DateTime(2017, 7, 2, 18, 0, 0, DateTimeKind.Utc);
 
 		private readonly Bot Bot;
 		private readonly Timer SteamAwardsTimer;
@@ -73,9 +72,9 @@ namespace ArchiSteamFarm {
 				return;
 			}
 
-			if (!Bot.ArchiWebHandler.Ready) {
-				return;
-			}
+			//if (!Bot.ArchiWebHandler.Ready) {
+			//	return;
+			//}
 
 			for (byte i = 0; (i < 3) && !(await IsDiscoveryQueueEmpty().ConfigureAwait(false)).GetValueOrDefault(); i++) {
 				HashSet<uint> queue = await Bot.ArchiWebHandler.GenerateNewDiscoveryQueue().ConfigureAwait(false);
@@ -96,9 +95,9 @@ namespace ArchiSteamFarm {
 		}
 
 		private async Task<bool?> IsDiscoveryQueueEmpty() {
-			if (!Bot.ArchiWebHandler.Ready) {
-				return null;
-			}
+			//if (!Bot.ArchiWebHandler.Ready) {
+			//	return null;
+			//}
 
 			HtmlDocument htmlDocument = await Bot.ArchiWebHandler.GetDiscoveryQueuePage().ConfigureAwait(false);
 			if (htmlDocument == null) {
@@ -126,9 +125,9 @@ namespace ArchiSteamFarm {
 				return;
 			}
 
-			if (!Bot.ArchiWebHandler.Ready) {
-				return;
-			}
+			//if (!Bot.ArchiWebHandler.Ready) {
+			//	return;
+			//}
 
 			HtmlDocument htmlDocument = await Bot.ArchiWebHandler.GetSteamAwardsPage().ConfigureAwait(false);
 
@@ -183,5 +182,3 @@ namespace ArchiSteamFarm {
 		}
 	}
 }
-*/
-
