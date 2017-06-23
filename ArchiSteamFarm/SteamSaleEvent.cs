@@ -67,7 +67,11 @@ namespace ArchiSteamFarm {
 			SteamDiscoveryQueueTimer?.Dispose();
 		}
 
-		public async Task ExploreDiscoveryQueue() {
+        public void callExploreDiscoveryQueue() {
+		    ExploreDiscoveryQueue().ConfigureAwait(false);
+        }
+
+		private async Task ExploreDiscoveryQueue() {
 			//if (DateTime.UtcNow >= SaleEndingDateUtc) {
 			//	return;
 			//}
