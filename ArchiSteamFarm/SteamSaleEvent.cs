@@ -95,29 +95,30 @@ namespace ArchiSteamFarm {
 		}
 
 		private async Task<bool?> IsDiscoveryQueueEmpty() {
+            return false; //enforce discovery
 			//if (!Bot.ArchiWebHandler.Ready) {
 			//	return null;
 			//}
 
-			HtmlDocument htmlDocument = await Bot.ArchiWebHandler.GetDiscoveryQueuePage().ConfigureAwait(false);
-			if (htmlDocument == null) {
-				return null;
-			}
+			//HtmlDocument htmlDocument = await Bot.ArchiWebHandler.GetDiscoveryQueuePage().ConfigureAwait(false);
+			//if (htmlDocument == null) {
+			//	return null;
+			//}
 
-			HtmlNode htmlNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@class='subtext']");
-			if (htmlNode == null) {
-				// No cards for exploring the queue available
-				return true;
-			}
+			//HtmlNode htmlNode = htmlDocument.DocumentNode.SelectSingleNode("//div[@class='subtext']");
+			//if (htmlNode == null) {
+			//	// No cards for exploring the queue available
+			//	return true;
+			//}
 
-			string text = htmlNode.InnerText;
-			if (!string.IsNullOrEmpty(text)) {
-				// It'd make more sense to check "Come back tomorrow", but it might not cover out-of-the-event queue
-				return !text.StartsWith("You can get ", StringComparison.Ordinal);
-			}
+			//string text = htmlNode.InnerText;
+			//if (!string.IsNullOrEmpty(text)) {
+			//	// It'd make more sense to check "Come back tomorrow", but it might not cover out-of-the-event queue
+			//	return !text.StartsWith("You can get ", StringComparison.Ordinal);
+			//}
 
-			Bot.ArchiLogger.LogNullError(nameof(text));
-			return null;
+			//Bot.ArchiLogger.LogNullError(nameof(text));
+			//return null;
 		}
 
 		private async Task VoteForSteamAwards() {
@@ -129,7 +130,9 @@ namespace ArchiSteamFarm {
 			//	return;
 			//}
 
-			HtmlDocument htmlDocument = await Bot.ArchiWebHandler.GetSteamAwardsPage().ConfigureAwait(false);
+			//HtmlDocument htmlDocument = await Bot.ArchiWebHandler.GetSteamAwardsPage().ConfigureAwait(false);
+			HtmlDocument htmlDocument  = await Bot.ArchiWebHandler.GetSteamPrefPage().ConfigureAwait(false);
+			HtmlDocument htmlDocument2 = await Bot.ArchiWebHandler.GetSteamHomePage().ConfigureAwait(false);
 
 			HtmlNodeCollection nominationsNodes = htmlDocument?.DocumentNode.SelectNodes("//div[@class='vote_nominations store_horizontal_autoslider']");
 			if (nominationsNodes == null) {
