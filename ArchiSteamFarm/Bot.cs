@@ -679,6 +679,8 @@ namespace ArchiSteamFarm {
 						return await ResponseUpdate(steamID).ConfigureAwait(false);
 					case "!VERSION":
 						return ResponseVersion(steamID);
+					case "!DISCO":
+						return await ResponseDiscoveryQueue(steamID).ConfigureAwait(false);
 					default:
 						return ResponseUnknown(steamID);
 				}
@@ -3363,6 +3365,13 @@ namespace ArchiSteamFarm {
 			List<string> responses = new List<string>(results.Where(result => !string.IsNullOrEmpty(result)));
 			return responses.Count > 0 ? string.Join("", responses) : null;
 		}
+
+		private static async Task<string> ResponseDiscoveryQueue(ulong steamID) {
+            await SteamSaleEvent.ExploreDiscoveryQueue().ConfigureAwait(false);
+
+			return null;
+		}
+
 
 		private string ResponseStatus(ulong steamID) {
 			if (steamID == 0) {

@@ -47,12 +47,12 @@ namespace ArchiSteamFarm {
 				return;
 			}
 
-			SteamAwardsTimer = new Timer(
-				async e => await VoteForSteamAwards().ConfigureAwait(false),
-				null,
-				TimeSpan.FromMinutes(1 + 0.2 * Bot.Bots.Count), // Delay
-				TimeSpan.FromHours(6.1) // Period
-			);
+			//SteamAwardsTimer = new Timer(
+			//	async e => await VoteForSteamAwards().ConfigureAwait(false),
+			//	null,
+			//	TimeSpan.FromMinutes(1 + 0.2 * Bot.Bots.Count), // Delay
+			//	TimeSpan.FromHours(6.1) // Period
+			//);
 
 			SteamDiscoveryQueueTimer = new Timer(
 				async e => await ExploreDiscoveryQueue().ConfigureAwait(false),
@@ -67,10 +67,10 @@ namespace ArchiSteamFarm {
 			SteamDiscoveryQueueTimer?.Dispose();
 		}
 
-		private async Task ExploreDiscoveryQueue() {
-			if (DateTime.UtcNow >= SaleEndingDateUtc) {
-				return;
-			}
+		public async Task ExploreDiscoveryQueue() {
+			//if (DateTime.UtcNow >= SaleEndingDateUtc) {
+			//	return;
+			//}
 
 			//if (!Bot.ArchiWebHandler.Ready) {
 			//	return;
@@ -121,67 +121,67 @@ namespace ArchiSteamFarm {
 			//return null;
 		}
 
-		private async Task VoteForSteamAwards() {
-			if (DateTime.UtcNow >= SaleEndingDateUtc) {
-				return;
-			}
+		//private async Task VoteForSteamAwards() {
+		//	if (DateTime.UtcNow >= SaleEndingDateUtc) {
+		//		return;
+		//	}
 
-			//if (!Bot.ArchiWebHandler.Ready) {
-			//	return;
-			//}
+		//	//if (!Bot.ArchiWebHandler.Ready) {
+		//	//	return;
+		//	//}
 
-			//HtmlDocument htmlDocument = await Bot.ArchiWebHandler.GetSteamAwardsPage().ConfigureAwait(false);
-			HtmlDocument htmlDocument  = await Bot.ArchiWebHandler.GetSteamPrefPage().ConfigureAwait(false);
-			HtmlDocument htmlDocument2 = await Bot.ArchiWebHandler.GetSteamHomePage().ConfigureAwait(false);
+		//	//HtmlDocument htmlDocument = await Bot.ArchiWebHandler.GetSteamAwardsPage().ConfigureAwait(false);
+		//	HtmlDocument htmlDocument  = await Bot.ArchiWebHandler.GetSteamPrefPage().ConfigureAwait(false);
+		//	HtmlDocument htmlDocument2 = await Bot.ArchiWebHandler.GetSteamHomePage().ConfigureAwait(false);
 
-			HtmlNodeCollection nominationsNodes = htmlDocument?.DocumentNode.SelectNodes("//div[@class='vote_nominations store_horizontal_autoslider']");
-			if (nominationsNodes == null) {
-				// Event ended, error or likewise
-				return;
-			}
+		//	HtmlNodeCollection nominationsNodes = htmlDocument?.DocumentNode.SelectNodes("//div[@class='vote_nominations store_horizontal_autoslider']");
+		//	if (nominationsNodes == null) {
+		//		// Event ended, error or likewise
+		//		return;
+		//	}
 
-			foreach (HtmlNode nominationsNode in nominationsNodes) {
-				HtmlNode myVoteNode = nominationsNode.SelectSingleNode("./div[@class='vote_nomination your_vote']");
-				if (myVoteNode != null) {
-					// Already voted
-					continue;
-				}
+		//	foreach (HtmlNode nominationsNode in nominationsNodes) {
+		//		HtmlNode myVoteNode = nominationsNode.SelectSingleNode("./div[@class='vote_nomination your_vote']");
+		//		if (myVoteNode != null) {
+		//			// Already voted
+		//			continue;
+		//		}
 
-				string voteIDText = nominationsNode.GetAttributeValue("data-voteid", null);
-				if (string.IsNullOrEmpty(voteIDText)) {
-					Bot.ArchiLogger.LogNullError(nameof(voteIDText));
-					return;
-				}
+		//		string voteIDText = nominationsNode.GetAttributeValue("data-voteid", null);
+		//		if (string.IsNullOrEmpty(voteIDText)) {
+		//			Bot.ArchiLogger.LogNullError(nameof(voteIDText));
+		//			return;
+		//		}
 
-				byte voteID;
-				if (!byte.TryParse(voteIDText, out voteID) || (voteID == 0)) {
-					Bot.ArchiLogger.LogNullError(nameof(voteID));
-					return;
-				}
+		//		byte voteID;
+		//		if (!byte.TryParse(voteIDText, out voteID) || (voteID == 0)) {
+		//			Bot.ArchiLogger.LogNullError(nameof(voteID));
+		//			return;
+		//		}
 
-				HtmlNodeCollection voteNodes = nominationsNode.SelectNodes("./div[@class='vote_nomination ']");
-				if (voteNodes == null) {
-					Bot.ArchiLogger.LogNullError(nameof(voteNodes));
-					return;
-				}
+		//		HtmlNodeCollection voteNodes = nominationsNode.SelectNodes("./div[@class='vote_nomination ']");
+		//		if (voteNodes == null) {
+		//			Bot.ArchiLogger.LogNullError(nameof(voteNodes));
+		//			return;
+		//		}
 
-				// Random a game we'll actually vote for, we don't want to make GabeN angry by rigging votes...
-				HtmlNode voteNode = voteNodes[Utilities.RandomNext(voteNodes.Count)];
+		//		// Random a game we'll actually vote for, we don't want to make GabeN angry by rigging votes...
+		//		HtmlNode voteNode = voteNodes[Utilities.RandomNext(voteNodes.Count)];
 
-				string appIDText = voteNode.GetAttributeValue("data-vote-appid", null);
-				if (string.IsNullOrEmpty(appIDText)) {
-					Bot.ArchiLogger.LogNullError(nameof(appIDText));
-					return;
-				}
+		//		string appIDText = voteNode.GetAttributeValue("data-vote-appid", null);
+		//		if (string.IsNullOrEmpty(appIDText)) {
+		//			Bot.ArchiLogger.LogNullError(nameof(appIDText));
+		//			return;
+		//		}
 
-				uint appID;
-				if (!uint.TryParse(appIDText, out appID) || (appID == 0)) {
-					Bot.ArchiLogger.LogNullError(nameof(appID));
-					return;
-				}
+		//		uint appID;
+		//		if (!uint.TryParse(appIDText, out appID) || (appID == 0)) {
+		//			Bot.ArchiLogger.LogNullError(nameof(appID));
+		//			return;
+		//		}
 
-				await Bot.ArchiWebHandler.SteamAwardsVote(voteID, appID).ConfigureAwait(false);
-			}
-		}
+		//		await Bot.ArchiWebHandler.SteamAwardsVote(voteID, appID).ConfigureAwait(false);
+		//	}
+		//}
 	}
 }
