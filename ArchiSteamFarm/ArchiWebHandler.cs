@@ -125,7 +125,11 @@ namespace ArchiSteamFarm {
 				return false;
 			}
 
-			const string request = URL;
+			string request = URL;
+			Dictionary<string, string> data = new Dictionary<string, string>(1) {
+				{ "sessionid", sessionID }
+			};
+
 			HtmlDocument htmlDocument = await WebBrowser.UrlPostToHtmlDocumentRetry(request, data).ConfigureAwait(false);
 			return true;
         }
