@@ -793,6 +793,14 @@ namespace ArchiSteamFarm {
 
 					return await ResponseView(steamID, args[1]).ConfigureAwait(false);
 
+				case "!VG":
+				case "!VIEWGET":
+					//if (args.Length > 2) {
+					//	return await ResponseView(steamID, args[1], args.GetArgsAsString(2)).ConfigureAwait(false);
+					//}
+
+					return await ResponseViewGet(steamID, args[1]).ConfigureAwait(false);
+
 				//case "!G":
 				//case "!GROUP":
 				//	//if (args.Length > 2) {
@@ -2098,6 +2106,30 @@ namespace ArchiSteamFarm {
 			return response.Length > 0 ? response.ToString() : null;
 		}
 
+		private async Task<string> ResponseViewGet(ulong steamID, string URL) {
+			if ((steamID == 0) || (URL == null)) {
+				ArchiLogger.LogNullError(nameof(steamID) + " || " + URL);
+				return null;
+			}
+
+			if (!IsOperator(steamID)) {
+				return null;
+			}
+
+			if (!IsConnectedAndLoggedOn) {
+				return FormatBotResponse(Strings.BotNotConnected);
+			}
+
+			StringBuilder response = new StringBuilder();
+
+				if (await ArchiWebHandler.BrowseURLGet(URL).ConfigureAwait(false)) {
+					//response.Append(FormatBotResponse(string.Format(Strings.BotAddLicenseWithItems, gameID, EResult.OK, gameID)));
+				} else {
+					//response.Append(FormatBotResponse(string.Format(Strings.BotAddLicense, gameID, EResult.AccessDenied)));
+				}
+
+			return response.Length > 0 ? response.ToString() : null;
+		}
 
 		private async Task<string> ResponseAddLicense(ulong steamID, ICollection<uint> gameIDs) {
 			if ((steamID == 0) || (gameIDs == null) || (gameIDs.Count == 0)) {

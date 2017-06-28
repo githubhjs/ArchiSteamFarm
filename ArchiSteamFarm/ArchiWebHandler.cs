@@ -23,6 +23,11 @@
 */
 
 using System;
+//using System.Web;// for HttpUtility;
+//using System.Web.HttpUtility;
+//using System.Net;// for HttpUtility;
+//using System.Collections;
+//using System.Collections.Specialized;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -41,6 +46,7 @@ using Formatting = Newtonsoft.Json.Formatting;
 
 namespace ArchiSteamFarm {
 	internal sealed class ArchiWebHandler : IDisposable {
+
 		private const string IEconService = "IEconService";
 		private const string IPlayerService = "IPlayerService";
 		private const string ISteamUserAuth = "ISteamUserAuth";
@@ -110,6 +116,91 @@ namespace ArchiSteamFarm {
 			return await WebBrowser.UrlPostRetry(request, data, referer).ConfigureAwait(false);
 		}
 
+      //public static NameValueCollection ParseQueryString (string query)
+      //{
+      //    return ParseQueryString (query, Encoding.UTF8);
+      //}
+
+      //public static NameValueCollection ParseQueryString (string query, Encoding encoding)
+      //{
+      //    if (query == null)
+      //        throw new ArgumentNullException ("query");
+      //    if (encoding == null)
+      //        throw new ArgumentNullException ("encoding");
+      //    if (query.Length == 0 || (query.Length == 1 && query[0] == '?'))
+      //        return new HttpQSCollection ();
+      //    if (query[0] == '?')
+      //        query = query.Substring (1);
+      //        
+      //    NameValueCollection result = new HttpQSCollection ();
+      //    ParseQueryString (query, encoding, result);
+      //    return result;
+      //}
+
+      //internal static void ParseQueryString (string query, Encoding encoding, NameValueCollection result)
+      //{
+      //    if (query.Length == 0)
+      //        return;
+
+      //    string decoded = HtmlDecode (query);
+      //    int decodedLength = decoded.Length;
+      //    int namePos = 0;
+      //    bool first = true;
+      //    while (namePos <= decodedLength) {
+      //        int valuePos = -1, valueEnd = -1;
+      //        for (int q = namePos; q < decodedLength; q++) {
+      //            if (valuePos == -1 && decoded [q] == '=') {
+      //                valuePos = q + 1;
+      //            } else if (decoded [q] == '&') {
+      //                valueEnd = q;
+      //                break;
+      //            }
+      //        }
+
+      //        if (first) {
+      //            first = false;
+      //            if (decoded [namePos] == '?')
+      //                namePos++;
+      //        }
+      //        
+      //        string name, value;
+      //        if (valuePos == -1) {
+      //            name = null;
+      //            valuePos = namePos;
+      //        } else {
+      //            name = UrlDecode (decoded.Substring (namePos, valuePos - namePos - 1), encoding);
+      //        }
+      //        if (valueEnd < 0) {
+      //            namePos = -1;
+      //            valueEnd = decoded.Length;
+      //        } else {
+      //            namePos = valueEnd + 1;
+      //        }
+      //        value = UrlDecode (decoded.Substring (valuePos, valueEnd - valuePos), encoding);
+
+      //        result.Add (name, value);
+      //        if (namePos == -1)
+      //            break;
+      //    }
+      //}
+        
+        internal Dictionary<string, string> DecodeQueryParameters(Uri uri)
+        {
+            if (uri == null)
+                throw new ArgumentNullException("uri");
+
+            if (uri.Query.Length == 0)
+                return new Dictionary<string, string>();
+
+            return uri.Query.TrimStart('?')
+                            .Split(new[] { '&', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(parameter => parameter.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries))
+                            .GroupBy(parts => parts[0],
+                                     parts => parts.Length > 2 ? string.Join("=", parts, 1, parts.Length - 1) : (parts.Length > 1 ? parts[1] : ""))
+                            .ToDictionary(grouping => grouping.Key,
+                                          grouping => string.Join(",", grouping));
+        }
+
 		internal async Task<bool> BrowseURL(string URL) {
             if (URL == null) {
                 return false;
@@ -125,12 +216,38 @@ namespace ArchiSteamFarm {
 				return false;
 			}
 
-			string request = URL;
-			Dictionary<string, string> data = new Dictionary<string, string>(1) {
-				{ "sessionid", sessionID }
-			};
+			string request = URL.Substring(0, URL.IndexOf("?"));
+            Uri UnparsedUrl = new Uri(URL);
+          //string query = UnparsedUrl.Query;
+          //var data = HttpUtility.ParseQueryString(query);
+            Dictionary<string, string> data = DecodeQueryParameters(UnparsedUrl);
+            data.Add("sessionid", sessionID);
+          //Dictionary<string, string> data = new Dictionary<string, string>(1) {
+          //    { "sessionid", sessionID }
+          //};
 
 			HtmlDocument htmlDocument = await WebBrowser.UrlPostToHtmlDocumentRetry(request, data).ConfigureAwait(false);
+			return true;
+        }
+
+		internal async Task<bool> BrowseURLGet(string URL) {
+            if (URL == null) {
+                return false;
+            }
+
+			if (!await RefreshSessionIfNeeded().ConfigureAwait(false)) {
+				return false;
+			}
+
+			string sessionID = WebBrowser.CookieContainer.GetCookieValue(SteamCommunityURL, "sessionid");
+			if (string.IsNullOrEmpty(sessionID)) {
+				Bot.ArchiLogger.LogNullError(nameof(sessionID));
+				return false;
+			}
+
+			string request = URL;
+
+			HtmlDocument htmlDocument = await WebBrowser.UrlGetToHtmlDocumentRetry(request).ConfigureAwait(false);
 			return true;
         }
 
