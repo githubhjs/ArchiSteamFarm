@@ -216,7 +216,7 @@ namespace ArchiSteamFarm {
 				return false;
 			}
 
-			string request = URL.Substring(0, URL.IndexOf("?"));
+			string request = (URL.IndexOf("?") == -1)? URL: URL.Substring(0, URL.IndexOf("?"));
             Uri UnparsedUrl = new Uri(URL);
           //string query = UnparsedUrl.Query;
           //var data = HttpUtility.ParseQueryString(query);
