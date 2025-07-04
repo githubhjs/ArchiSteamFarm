@@ -88,26 +88,26 @@ public static class SharedInfo {
 	[PublicAPI]
 	public static bool IsRuntimeTrimmed => BuildInfo.IsRuntimeTrimmed;
 
-	[field: AllowNull]
-	[field: MaybeNull]
-	internal static string HomeDirectory {
-		get {
-			if (!string.IsNullOrEmpty(field)) {
-				return field;
-			}
+       internal static string HomeDirectory {
+               get {
+                       if (!string.IsNullOrEmpty(_homeDirectory)) {
+                               return _homeDirectory;
+                       }
 
 			// We're aiming to handle two possible cases here, classic publish and single-file publish which is possible with OS-specific builds
 			// In order to achieve that, we have to guess the case above from the binary's name
 			// We can't just return our base directory since it could lead to the (wrong) temporary directory of extracted files in a single-publish scenario
 			// If the path goes to our own binary, the user is using OS-specific build, single-file or not, we'll use path to location of that binary then
 			// Otherwise, this path goes to some third-party binary, likely dotnet/mono, the user is using our generic build or other custom binary, we need to trust our base directory then
-			return field = Path.GetFileNameWithoutExtension(OS.ProcessFileName) == AssemblyName ? Path.GetDirectoryName(OS.ProcessFileName) ?? AppContext.BaseDirectory : AppContext.BaseDirectory;
-		}
-	}
+                       return _homeDirectory = Path.GetFileNameWithoutExtension(OS.ProcessFileName) == AssemblyName ? Path.GetDirectoryName(OS.ProcessFileName) ?? AppContext.BaseDirectory : AppContext.BaseDirectory;
+               }
+       }
 
 	internal static string ProgramIdentifier => $"{PublicIdentifier} V{Version} ({BuildInfo.Variant}/{ModuleVersion:N} | {OS.Version}) in [{Directory.GetCurrentDirectory()}]";
 	internal static string PublicIdentifier => $"{AssemblyName}{(BuildInfo.IsCustomBuild ? "-custom" : PluginsCore.HasCustomPluginsLoaded ? "-modded" : "")}";
 	internal static Version Version => Assembly.GetExecutingAssembly().GetName().Version ?? throw new InvalidOperationException(nameof(Version));
 
-	private static Guid ModuleVersion => Assembly.GetExecutingAssembly().ManifestModule.ModuleVersionId;
+       private static Guid ModuleVersion => Assembly.GetExecutingAssembly().ManifestModule.ModuleVersionId;
+
+       private static string? _homeDirectory;
 }
